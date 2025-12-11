@@ -1,9 +1,34 @@
+<?php
+session_start();
+require_once 'db.php';
+
+// Check if user is logged in and is admin
+$isAdmin = false;
+if (isset($_SESSION['user_id'])) {
+    try {
+        $db = getDBConnection();
+        $stmt = $db->prepare("SELECT is_admin FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch(PDO::FETCH_ASSOC);
+        $isAdmin = ($user && $user['is_admin'] == 1);
+    } catch (Exception $e) {
+        $isAdmin = false;
+    }
+}
+
+if (!$isAdmin) {
+    // Redirect non-admin users
+    header('Location: index.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard - ParkEase</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -19,15 +44,16 @@
         }
     </style>
 </head>
-<body class="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen">
+<body class="bg-gradient-to-br from-teal-50 via-cyan-50 to-blue-50 min-h-screen">
     
     <!-- Navbar -->
     <nav class="bg-white shadow-lg">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
                 <div class="flex items-center">
-                    <a href="index.php" class="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                        <i class="fas fa-parking mr-2"></i>ParkEase
+                    <a href="index.php" class="flex items-center gap-2">
+                        <img src="favicon.png" alt="ParkEase Logo" class="w-10 h-10 rounded-lg">
+                        <span class="text-2xl font-bold bg-gradient-to-r from-teal-500 to-blue-600 bg-clip-text text-transparent">ParkEase</span>
                     </a>
                     <span class="ml-4 text-gray-500">Admin Dashboard</span>
                 </div>
@@ -106,7 +132,8 @@
                             <th class="text-left py-4 px-4 font-semibold text-gray-700">Vehicle</th>
                             <th class="text-left py-4 px-4 font-semibold text-gray-700">Phone</th>
                             <th class="text-left py-4 px-4 font-semibold text-gray-700">Date</th>
-                            <th class="text-left py-4 px-4 font-semibold text-gray-700">Time</th>
+                            <th class="text-left py-4 px-4 font-semibold text-gray-700">Check-in</th>
+                            <th class="text-left py-4 px-4 font-semibold text-gray-700">Check-out</th>
                             <th class="text-left py-4 px-4 font-semibold text-gray-700">Status</th>
                             <th class="text-left py-4 px-4 font-semibold text-gray-700">Booked At</th>
                         </tr>
@@ -221,7 +248,8 @@
                             <td class="py-4 px-4">${booking.vehicle_number}</td>
                             <td class="py-4 px-4">${booking.phone_number}</td>
                             <td class="py-4 px-4">${booking.booking_date}</td>
-                            <td class="py-4 px-4">${booking.booking_time}</td>
+                            <td class="py-4 px-4">${booking.check_in_time}</td>
+                            <td class="py-4 px-4">${booking.check_out_time}</td>
                             <td class="py-4 px-4">
                                 <span class="px-3 py-1 rounded-full text-xs font-semibold ${
                                     booking.status === 'active' ? 'bg-green-100 text-green-800' :
