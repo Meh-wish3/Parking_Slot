@@ -317,11 +317,13 @@
                         <i class="fas fa-phone mr-2 text-teal-400"></i>Phone Number
                     </label>
                     <div class="relative group">
-                        <input type="tel" id="phone" name="phone"
+                        <input type="tel" id="phone" name="phone" required
+                               pattern="[0-9]{10}" maxlength="10"
                                class="custom-input w-full px-5 py-4 rounded-xl text-white focus:outline-none"
-                               placeholder="Your Phone Number">
+                               placeholder="10-digit phone number">
                         <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-teal-500/20 to-blue-500/20 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
                     </div>
+                    <p id="phoneStatus" class="text-xs mt-1 hidden"></p>
                 </div>
                 
                 <!-- Password Field -->
@@ -498,6 +500,48 @@
         
         confirmInput.addEventListener('input', checkPasswordMatch);
         
+        // Phone number validation
+        const phoneInput = document.getElementById('phone');
+        const phoneStatus = document.getElementById('phoneStatus');
+        
+        function validatePhone() {
+            const phone = phoneInput.value;
+            phoneStatus.classList.remove('hidden');
+            
+            if (phone.length === 0) {
+                phoneStatus.classList.add('hidden');
+                return false;
+            }
+            
+            // Check if phone contains only digits
+            if (!/^[0-9]*$/.test(phone)) {
+                phoneStatus.textContent = '✗ Phone number must contain only digits';
+                phoneStatus.className = 'text-xs mt-1 text-red-400';
+                return false;
+            }
+            
+            // Check if phone is exactly 10 digits
+            if (phone.length < 10) {
+                phoneStatus.textContent = `✗ Phone number must be 10 digits (${phone.length}/10)`;
+                phoneStatus.className = 'text-xs mt-1 text-yellow-400';
+                return false;
+            }
+            
+            if (phone.length === 10) {
+                phoneStatus.textContent = '✓ Valid phone number';
+                phoneStatus.className = 'text-xs mt-1 text-green-400';
+                return true;
+            }
+            
+            return false;
+        }
+        
+        phoneInput.addEventListener('input', function(e) {
+            // Remove non-numeric characters
+            this.value = this.value.replace(/[^0-9]/g, '');
+            validatePhone();
+        });
+        
         // Form submission
         document.getElementById('signupForm').addEventListener('submit', async function(e) {
             e.preventDefault();
@@ -513,9 +557,17 @@
             // Client-side validation
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirm_password').value;
+            const phone = document.getElementById('phone').value;
             
             if (password !== confirmPassword) {
                 errorText.textContent = 'Passwords do not match';
+                errorDiv.classList.remove('hidden');
+                return;
+            }
+            
+            // Validate phone number
+            if (!/^[0-9]{10}$/.test(phone)) {
+                errorText.textContent = 'Phone number must be exactly 10 digits';
                 errorDiv.classList.remove('hidden');
                 return;
             }

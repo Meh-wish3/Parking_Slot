@@ -42,6 +42,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit;
         }
         
+        // Validate phone number
+        if (empty($phone)) {
+            echo json_encode(['success' => false, 'message' => 'Phone number is required']);
+            exit;
+        }
+        
+        if (!preg_match('/^[0-9]{10}$/', $phone)) {
+            echo json_encode(['success' => false, 'message' => 'Phone number must be exactly 10 digits']);
+            exit;
+        }
+        
         // Check if email already exists
         $stmt = $db->prepare("SELECT id FROM users WHERE email = ?");
         $stmt->execute([$email]);

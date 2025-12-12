@@ -2,6 +2,7 @@
 session_start();
 $isLoggedIn = isset($_SESSION['user_id']);
 $userName = $_SESSION['user_name'] ?? '';
+$isAdmin = $_SESSION['is_admin'] ?? false;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -127,6 +128,11 @@ $userName = $_SESSION['user_name'] ?? '';
                         <span class="text-gray-700 font-medium">
                             <i class="fas fa-user-circle mr-1"></i><?php echo htmlspecialchars($userName); ?>
                         </span>
+                        <?php if ($isAdmin): ?>
+                            <a href="admin.php" class="px-6 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 font-medium">
+                                <i class="fas fa-shield-alt mr-2"></i>Admin Panel
+                            </a>
+                        <?php endif; ?>
                         <a href="#" onclick="logout()" class="px-6 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-full hover:shadow-lg transform hover:scale-105 transition-all duration-200 font-medium">
                             Logout
                         </a>
@@ -157,6 +163,11 @@ $userName = $_SESSION['user_name'] ?? '';
                         <div class="px-3 py-2 text-white font-medium">
                             <i class="fas fa-user-circle mr-1"></i><?php echo htmlspecialchars($userName); ?>
                         </div>
+                        <?php if ($isAdmin): ?>
+                            <a href="admin.php" class="block w-full px-4 py-2 bg-gradient-to-r from-purple-500 to-indigo-600 text-white rounded-lg hover:shadow-lg transition-all text-center mb-2">
+                                <i class="fas fa-shield-alt mr-2"></i>Admin Panel
+                            </a>
+                        <?php endif; ?>
                         <a href="#" onclick="logout()" class="block w-full px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:shadow-lg transition-all text-center">Logout</a>
                     <?php else: ?>
                         <a href="login.php" class="block w-full px-4 py-2 text-white mb-2 rounded-lg hover:bg-white/10 transition-colors text-center">Login</a>
